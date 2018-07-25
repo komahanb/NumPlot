@@ -1,3 +1,6 @@
+.. image:: https://travis-ci.org/komahanb/NumPlot.svg?branch=master
+    :target: https://travis-ci.org/komahanb/NumPlot
+             
 NumPlot Module
 ===============
 
