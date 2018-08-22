@@ -11,6 +11,21 @@ def hmm():
     if helpers.get_answer():
         print(get_hmm())
 
+# We encapsulate data as Map
+# We define Style
+# Once a Style is associated with Map we have defined a View
+# map   = Map(datafilename)
+# style = Style(axes, labels, colors, lines, title, etc)
+# 
+# map.setStyle(style)
+# map.view()
+# 
+# map.compare(map_list, style_list) # or make a map with key as datamap and value as style
+# 
+# map.view(style)/map.plot(style)
+# view.compare(view2) --> extract styles from vies
+
+# Map
 class Map(dict):
     """
     A plotable map implementation that extends python's dictionary
@@ -18,10 +33,10 @@ class Map(dict):
 
     Author: Komahan Boopathy (komahan@gatech.edu)
     """
-    def __init__(self, fname, data_name=None, *args, **kw):
+    def __init__(self, fname, map_name=None, *args, **kw):
         super(Map, self).__init__(*args, **kw)
 
-        self.data_name = data_name
+        self.map_name = map_name
         
         # Determine the number of lines
         num_lines = sum(1 for line in open(fname))
@@ -54,6 +69,51 @@ class Map(dict):
                 vnum += 1
                 
         return
+
+    def plot(self, xkey, ykeys = None):
+        # Use the map's keys if the keys to plot are  not supplied
+        if ykeys is None:
+            ykeys = self.keys()
+            
+        # Plot each key aloing y axis
+        for ykey in ykeys:
+            plt.plot(self[xkey], self[ykey], '-o', lw = 2, label = ykey)
+
+        # Return the plot handle
+        return plt
+
+
+    def twin_plot(self, xkey, y1keys, y2keys):        
+        fig, ax1 = plt.subplots()
+    
+        # Plot each key aloing y axis
+        for ykey in y1keys:
+            ax1.plot(self[xkey], self[ykey], '-', lw = 2, label = ykey)
+
+        ax2 = ax1.twinx()
+        # Plot each key aloing y axis
+        for ykey in y2keys:
+            ax2.plot(self[xkey], self[ykey], '--', lw = 2, label = ykey)
+
+        # Return the plot handle
+        return plt, fig, ax1, ax2
+
+
+    def compare(self, xkey, ykeys, map2):
+        # Use the map's keys if the keys to plot are  not supplied
+        if ykeys is None:
+            ykeys = self.keys()
+            
+        # Plot each key aloing y axis
+        for ykey in ykeys:
+            plt.plot(self[xkey], self[ykey], lw = 2, label = ykey + " " + self.map_name)
+
+        # Plot each key aloing y axis
+        for ykey in ykeys:
+            plt.plot(map2[xkey], map2[ykey], lw = 2, label = ykey + " " + map2.map_name)
+
+        # Return the plot handle
+        return plt
     
 # what you want to plot --> txt with header, txt without headers
 # Plot on dataset
@@ -100,6 +160,35 @@ class Plot:
         
         # Return the plot handle
         return
+    
+class Compare:
+    '''
+    To compare two or more data sets. Dissimilar data sets can not be
+    compared, therefore make sure they are comparable. This is where
+    dataname becomes handy.
+
+    1. two datamaps are there to compare
+    3. two plot objects created using datamaps are there to compare
+    '''
+    def __init__(datalist):
+        self.datalist = datalist        
+        return
+    
+    def compare(self, xkey, ykeys, map1, map2):
+        # Use the map's keys if the keys to plot are  not supplied
+        if ykeys is None:
+            ykeys = map1.keys()
+            
+        # Plot each key aloing y axis
+        for ykey in ykeys:
+            plt.plot(map1[xkey], map1[ykey], lw = 2, label = map1.map_name + " " + ykey)
+
+        # Plot each key aloing y axis
+        for ykey in ykeys:
+            plt.plot(map2[xkey], map2[ykey], lw = 2, label = map2.map_name + " " + ykey)
+
+        # Return the plot handle
+        return plt
 
 if __name__ == "__main__":
     
