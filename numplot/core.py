@@ -1,4 +1,4 @@
-from . import helpers
+#from . import helpers
 
 # Import matplotlib
 import matplotlib.pylab as plt
@@ -73,7 +73,7 @@ class Map(dict):
 
     Author: Komahan Boopathy (komahan@gatech.edu)
     """
-    def __init__(self, fname, map_name=None, *args, **kw):
+    def __init__(self, fname, delimiter=',', map_name=None, *args, **kw):
         super(Map, self).__init__(*args, **kw)
 
         self.map_name = map_name
@@ -86,16 +86,20 @@ class Map(dict):
         with open(fname) as f:    
             # Read first line to determine keys
             first_line = f.readline()
-            keys = first_line.split()
-            nkeys = len(keys)
-            if nkeys == 0:
-                raise "no header??"
+            try:
+                keys = first_line.split(delimiter)
+                nkeys = len(keys)
+                if nkeys == 0:
+                    raise "no header??"
+            except:
+                print("Error: No keys found! Check delimiter input : comma or space?")
+                raise
     
             # Create a table to store values
             A = np.zeros([nkeys, num_lines-1])    
             lnum = 0
             for line in f:
-                vals = line.split()
+                vals = line.split(delimiter)
                 vnum = 0
                 for v in vals:
                     A[vnum,lnum] = float(v)
@@ -105,7 +109,7 @@ class Map(dict):
             # Create a map with columns of A
             vnum = 0
             for key in keys:
-                self[key] = A[vnum,:]
+                self[key.strip()] = A[vnum,:]
                 vnum += 1
                 
         return
@@ -189,7 +193,7 @@ class Plot:
             
         # Plot each key aloing y axis
         for ykey in ykeys:
-            plt.plot(self.map[xkey]/xscale, self.map[ykey]/yscale, lw = 2, label = ykey)
+            plt.plot(self.map[xkey]/xscale, self.map[ykey]/yscale, '-o',lw = 2, label = ykey)
 
         # Plot save and close
         plt.xlabel(xlabel)
@@ -231,6 +235,10 @@ class Compare:
         return plt
 
 if __name__ == "__main__":
+
+    data = Map('data.csv')
+    print data
+    stop
     
     # Wrap all these into context object
     datafile   = "ebeam.dat"
